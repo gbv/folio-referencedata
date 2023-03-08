@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# insert-k10plus-identifier-types <OKAPI> <TENANT> <OKAPIUSERNAME> <OKAPIPASSWORD>
+# Or set environment variables $OKAPI $TENANT $OKAPIUSERNAME $OKAPIPASSWORD and
+# call insert-k10plus-identifier-types without arguments.
+
+set -e
+
+: ${OKAPI:=$1}
+: ${OKAPI:=http://localhost:8081}
+: ${TENANT:=$2}
+: ${TENANT:=diku}
+: ${OKAPIUSERNAME:=$3}
+: ${OKAPIUSERNAME:=diku_admin}
+: ${OKAPIPASSWORD:=$4}
+: ${OKAPIPASSWORD:=admin}
+
+TOKEN=$( curl -sS -D - -H "X-Okapi-Tenant: $TENANT" -H "Content-type: application/json" \
+  -d "{\"tenant\":\"$TENANT\",\"username\":\"$OKAPIUSERNAME\",\"password\":\"$OKAPIPASSWORD\"}" \
+  "$OKAPI/authn/login" \
+  | grep -i "^x-okapi-token: " | tr -d "\n\r" )
+
+echo "TOKEN=$TOKEN"
+
+for file in k10plus/identifier-types/*.json
+do
+  echo "$file"
+  curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
+         -d "@$file" "$OKAPI/identifier-types"
+done
+
