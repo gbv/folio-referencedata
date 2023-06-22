@@ -29,7 +29,7 @@ do
          -d "@$file" "$OKAPI/identifier-types"
 done
 
-for file in k10plus/material-types/*.json
+for file in k10plus/material_types/*.json
 do
   echo "$file"
   curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
