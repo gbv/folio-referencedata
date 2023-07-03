@@ -42,3 +42,10 @@ do
   curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
          -d "@$file" "$OKAPI/loan-types"
 done
+
+for file in k10plus/holdings-sources/*.json
+do
+  echo "$file"
+  curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
+         -d "@$file" "$OKAPI/holdings-sources"
+done
