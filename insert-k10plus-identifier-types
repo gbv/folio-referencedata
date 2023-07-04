@@ -22,28 +22,28 @@ TOKEN=$( curl -sS -D - -H "X-Okapi-Tenant: $TENANT" -H "Content-type: applicatio
 
 echo "TOKEN=$TOKEN"
 
-for file in k10plus/identifier-types/*.json
+for file in local_k10plus/identifier-types/*.json
 do
   echo "$file"
   curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
          -d "@$file" "$OKAPI/identifier-types"
 done
 
-for file in k10plus/material-types/*.json
+for file in local_k10plus/material-types/*.json
 do
   echo "$file"
   curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
          -d "@$file" "$OKAPI/material-types"
 done
 
-for file in k10plus/loan-types/*.json
+for file in local_k10plus/loan-types/*.json
 do
   echo "$file"
   curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
          -d "@$file" "$OKAPI/loan-types"
 done
 
-for file in k10plus/holdings-sources/*.json
+for file in local_k10plus/holdings-sources/*.json
 do
   echo "$file"
   curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
