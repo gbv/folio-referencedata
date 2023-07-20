@@ -1,6 +1,5 @@
- {
-            "id": "26e54875-9984-4ef1-9d80-f2f4b242f8a0",
-            "name": "Braille-test",
-            "source": "local"
-           
-            }
+{
+    "id": "26e54875-9984-4ef1-9d80-f2f4b242f8a0",
+    "name": "Braille-test",
+    "source": "local"
+}
