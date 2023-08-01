@@ -1,0 +1,72 @@
+#!/bin/sh
+
+# delete-folio-reference-data <OKAPI> <TENANT> <OKAPIUSERNAME> <OKAPIPASSWORD>
+# Or set environment variables $OKAPI $TENANT $OKAPIUSERNAME $OKAPIPASSWORD and
+# call delete-folio-reference-data without arguments.
+
+set -e
+
+: ${OKAPI:=$1}
+: ${OKAPI:=http://localhost:8081}
+: ${TENANT:=$2}
+: ${TENANT:=diku}
+: ${OKAPIUSERNAME:=$3}
+: ${OKAPIUSERNAME:=diku_admin}
+: ${OKAPIPASSWORD:=$4}
+: ${OKAPIPASSWORD:=admin}
+
+TOKEN=$( curl -sS -D - -H "X-Okapi-Tenant: $TENANT" -H "Content-type: application/json" \
+  -d "{\"tenant\":\"$TENANT\",\"username\":\"$OKAPIUSERNAME\",\"password\":\"$OKAPIPASSWORD\"}" \
+  "$OKAPI/authn/login" \
+  | grep -i "^x-okapi-token: " | tr -d "\n\r" )
+
+echo "TOKEN=$TOKEN"
+
+process ()
+{
+  norecord=0
+  processed=0
+  deleted=0
+  failed=0
+
+  while read line
+  do
+    if [ -z "$line" ]
+    then
+      continue
+    fi
+ 
+    endpoint=$(echo "$line" | cut -f 1)
+    id=$(echo "$line" | cut -f 2)
+    name=$(echo "$line" | cut -f 3)
+   
+    json=$(curl --dump-header dump-header -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" "$OKAPI/$endpoint/$id")
+    header=$(cat dump-header)
+    rm dump-header
+    if echo "$header" | head -1 | grep -q 404
+    then
+      echo "$OKAPI$1/$endpoint/$id $name not found on server"
+      norecord=$(( norecord + 1 ))
+    else
+      echo "$OKAPI$1/$endpoint/$id $name found on server"
+      processed=$(( processed + 1 ))
+        
+      response=$(curl -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
+	    -X DELETE "$OKAPI/$endpoint/$id")
+    
+      if [ -z "$response"]
+      then 
+        deleted=$(( deleted + 1 ))
+      else
+        echo "$response" 
+        failed=$(( failed + 1 ))
+      fi
+    fi
+  done
+  
+  echo "$norecord not found on server, $processed processed, $deleted deleted, $failed failed"
+}
+
+process  < toBeDeleted_smaller.tsv
+
+       
