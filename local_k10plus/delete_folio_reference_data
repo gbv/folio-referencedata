@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# delete-folio-reference-data <OKAPI> <TENANT> <OKAPIUSERNAME> <OKAPIPASSWORD>
+# delete_folio_reference_data <OKAPI> <TENANT> <OKAPIUSERNAME> <OKAPIPASSWORD>
 # Or set environment variables $OKAPI $TENANT $OKAPIUSERNAME $OKAPIPASSWORD and
-# call delete-folio-reference-data without arguments.
+# call delete_folio_reference_data without arguments.
 
 set -e
 
@@ -69,4 +69,3 @@ process ()
 
 process  < toBeDeleted.tsv
 
-       
