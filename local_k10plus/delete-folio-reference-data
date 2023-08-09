@@ -67,6 +67,6 @@ process ()
   echo "$norecord not found on server, $processed processed, $deleted deleted, $failed failed"
 }
 
-process  < toBeDeleted_smaller.tsv
+process  < toBeDeleted.tsv
 
        

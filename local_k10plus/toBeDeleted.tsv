@@ -56,3 +56,11 @@ loan-types	e8b311a6-3b21-43f2-a269-dd9310cb2d0e	Course reserves
 loan-types	a1dc1ce3-d56f-4d8a-b498-d5d674ccc845	Selected
 loan-types	2e48e713-17f3-4c13-a9f8-23845bb210a4	Reading room
 loan-types	2b94c631-fca9-4892-a730-03ee529ffe27	Can circulate
+ill-policies	c51f7aa9-9997-45e6-94d6-b502445aae9d	Unknown reproduction policy
+ill-policies	37fc2702-7ec9-482a-a4e3-5ed9a122ece1	Unknown lending policy
+ill-policies	46970b40-918e-47a4-a45d-b1677a2d3d46	Will lend
+ill-policies	6bc6a71f-d6e2-4693-87f1-f495afddff00	Will not reproduce
+ill-policies	9e49924b-f649-4b36-ab57-e66e639a9b0e	Limited lending policy
+ill-policies	2a572e7b-dfe5-4dee-8a62-b98d26a802e6	Will reproduce
+ill-policies	2b870182-a23d-48e8-917d-9421e5c3ce13	Will lend hard copy only
+ill-policies	b0f97013-87f5-4bab-87f2-ac4a5191b489	Will not lend

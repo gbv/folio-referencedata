@@ -22,31 +22,20 @@ TOKEN=$( curl -sS -D - -H "X-Okapi-Tenant: $TENANT" -H "Content-type: applicatio
 
 echo "TOKEN=$TOKEN"
 
-for file in electronic-access-relationships/*.json
-do
+find -type f -name "*.json" | while IFS= read -r file; do
   echo "$file"
-  curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
-         -d "@$file" "$OKAPI/electronic-access-relationships"
-done
-
-for file in holdings-note-types/*.json
-do
-  echo "$file"
-  curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
-         -d "@$file" "$OKAPI/holdings-note-types"
-done
-
-for file in instance-note-types/*.json
-do
-  echo "$file"
-  curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
-         -d "@$file" "$OKAPI/instance-note-types"
-done
-
-
-for file in instance-relationship-types/*.json
-do
-  echo "$file"
-  curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
-         -d "@$file" "$OKAPI/instance-relationship-types"
+  endpoint=$(basename "$(dirname "$file")")
+  resource_id=$(jq -r '.id' "$file")
+  if [ -z "$resource_id" ]; then
+    curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
+      -d "@$file" "$OKAPI/$endpoint"
+  else
+    response=$(curl -w"\n%{http_code}" -sS -X PUT -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
+      -d "@$file" "$OKAPI/$endpoint/$resource_id")
+    status_code=$(echo "$response" | tail -n 1)
+    if [ "$status_code" = "404" ]; then
+      curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
+        -d "@$file" "$OKAPI/$endpoint"
+    fi
+  fi
 done
