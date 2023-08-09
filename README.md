@@ -12,7 +12,7 @@ For example
 ./insert_local_k10plus https://folio-demo.gbv.de/okapi diku diku_admin admin
 ```
 ## Delete
-For K10plus, invoke `delete_folio_reference_data` to delete the values in toBeDeleted.tsv
+For K10plus, invoke `delete_folio_reference_data` to delete the values in toBeDeleted.tsv (FOLIO reference data, which is not needed in GBV).
 ```
 cd local_k10plus
 ./delete_folio_reference_data <okapi_url> <tenant> <username> <password>
