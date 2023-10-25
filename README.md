@@ -1,5 +1,5 @@
 # folio-referencedata
-A (temporary) place to store and manage local FOLIO Inventory reference value files and - in folder - "ouf_vzg" standard ouf-settings
+A (temporary) place to store and manage local FOLIO Inventory reference value files and - in folder "ouf_vzg" - standard ouf-settings
 
 ## Insert
 For K10plus, invoke `local_k10plus/insert_local_k10plus` to update the values of a tenant by calling
