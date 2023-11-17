@@ -1,5 +1,7 @@
 #!/bin/bash
 
+### ouf-update.sh, Version 1.1
+
 source profile.sh ### set environment
 
 # Initialization and Configuration
@@ -7,12 +9,14 @@ source profile.sh ### set environment
 CONF_DIR="/ouf-pica/confdir"
 INI_FILE="$CONF_DIR/other.ini"
 LOG_DIR="/ouf-pica/log"
-LOG_FILE="$LOG_DIR/script.log"
-LOG_LEVEL="INFO" # Default log level. Change to "DEBUG" for verbose logging.
+LOG_FILE="$LOG_DIR/ouf-restart.log"
+
+# Set default LOG_LEVEL
+LOG_LEVEL="INFO"
 
 # Function to handle script exit
 handle_exit() {
-    log "INFO" "Script exiting."
+    log "INFO" "Done."
     # Add any cleanup tasks here if necessary
 }
 
@@ -25,15 +29,63 @@ mkdir -p "$LOG_DIR" || {
     exit 1
 }
 
+# Function to clean up old log files (older than 30 days)
+cleanup_old_logs() {
+    find "$LOG_DIR" -name "ouf-restart.log.*" -mtime +30 -exec rm {} \;
+}
+
+# Function to rotate log
+rotate_log() {
+    local current_date=$(date +%Y-%m-%d)
+    local last_log_date=$(head -1 "$LOG_FILE" | cut -d' ' -f1)
+    local logfile_size=$(stat -c%s "$LOG_FILE")
+
+    # Check if the logfile is larger than 0 bytes and if a new logfile needs to be created for the current day
+    if [[ $logfile_size -gt 0 && "$last_log_date" != "$current_date" ]]; then
+        # Copy the last 20 lines into a new file
+        tail -n 20 "$LOG_FILE" >"${LOG_FILE}.${current_date}"
+
+        # Empty the current log file and add the current date
+        echo "$current_date - Logfile rotated" >"$LOG_FILE"
+    fi
+}
+
+# Rotate logs and clean up old logs
+rotate_log
+cleanup_old_logs
+
 # Log function with log level and message
 log() {
     local level=$1
     local message=$2
 
-    if [[ $LOG_LEVEL == "DEBUG" || $level == "INFO" ]]; then
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" | tee -a "$LOG_FILE"
+    if [[ $LOG_LEVEL != "OFF" ]]; then
+        if [[ -z "$ouf_cron_auto_restart" || "$ouf_cron_auto_restart" == "true" ]]; then
+            if [[ $LOG_LEVEL == "DEBUG" || $level == "INFO" ]]; then
+                echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" | tee -a "$LOG_FILE"
+            fi
+        fi
     fi
 }
+
+# Read and validate ouf_cron_auto_restart value
+ouf_cron_auto_restart=$(grep -Po '(?<=ouf_cron_auto_restart = )\S+' "$INI_FILE" 2>/dev/null)
+if [[ "$ouf_cron_auto_restart" != "true" && "$ouf_cron_auto_restart" != "false" ]]; then
+    ouf_cron_auto_restart=""
+    echo "Invalid value for ouf_cron_auto_restart. Valid values are 'true' or 'false'. Defaulting to no auto restart." | tee -a "$LOG_FILE"
+fi
+
+# Read and validate ouf_cron_auto_restart_debug_level value
+ouf_cron_auto_restart_debug_level=$(grep -Po '(?<=ouf_cron_auto_restart_debug_level = )\S+' "$INI_FILE" 2>/dev/null)
+if [[ "$ouf_cron_auto_restart_debug_level" != "DEBUG" && "$ouf_cron_auto_restart_debug_level" != "INFO" && "$ouf_cron_auto_restart_debug_level" != "OFF" ]]; then
+    ouf_cron_auto_restart_debug_level=""
+    echo "Invalid value for ouf_cron_auto_restart_debug_level. Valid values are 'DEBUG', 'INFO', or 'OFF'. Defaulting to INFO level." | tee -a "$LOG_FILE"
+fi
+
+# Set LOG_LEVEL based on configuration if valid
+if [ -n "$ouf_cron_auto_restart_debug_level" ]; then
+    LOG_LEVEL="$ouf_cron_auto_restart_debug_level"
+fi
 
 # Check for required directories and files
 if [ ! -d "$CONF_DIR" ] || [ ! -f "$INI_FILE" ]; then
@@ -64,11 +116,6 @@ start_services() {
 }
 
 # Main Script Logic
-ouf_cron_auto_restart=$(grep -Po '(?<=ouf_cron_auto_restart = )\S+' "$INI_FILE") || {
-    log "INFO" "Failed to read configuration"
-    exit 1
-}
-
 if [ "$ouf_cron_auto_restart" = "true" ]; then
     log "DEBUG" "Checking if ouf_cron_auto_restart is enabled: yes"
 
