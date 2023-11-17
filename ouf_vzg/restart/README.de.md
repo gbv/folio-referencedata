@@ -1,6 +1,6 @@
 # **Dokumentation für** `ouf-update.sh`
 
-*Read this in other languages: [English](README.md), [German](README.de.md)
+*Read this in other languages: [English](README.md), [German](README.de.md)*
 
 ## **Übersicht**
 
