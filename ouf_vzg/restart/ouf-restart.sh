@@ -1,8 +1,8 @@
 #!/bin/bash
 
-### ouf-update.sh, Version 1.1
-
 source profile.sh ### set environment
+
+set -x
 
 # Initialization and Configuration
 
