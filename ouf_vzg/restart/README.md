@@ -1,65 +1,67 @@
-# **Dokumentation für** `ouf-update.sh`
+# **Documentation for** `ouf-update.sh`
 
-## **Übersicht**
+*Read this in other languages: [English](README.md), [German](README.de.md)
 
-`ouf-update.sh` ist ein Bash-Skript entwickelt für die Überwachung und Verwaltung von Diensten auf einem Server, speziell fokussiert auf den `ouf_update` Dienst. Das Hauptziel des Skripts ist es, auf Ausfälle von `ouf_update` zeitnah zu reagieren, indem es regelmäßig dessen Status überprüft und bei Bedarf einen Neustart der Dienste initiiert. Das Skript wird alle 60 Sekunden durch einen Cron-Job ausgeführt, um eine kontinuierliche Überwachung und schnelle Reaktion zu gewährleisten.
+## **Overview**
 
-## **Funktionen**
+`ouf-update.sh` is a Bash script designed for monitoring and managing services on a server, specifically focusing on the `ouf_update` service. The primary goal of the script is to respond promptly to any failures of `ouf_update` by regularly checking its status and initiating a service restart when necessary. The script is executed every 60 seconds by a cron job to ensure continuous monitoring and quick response.
 
-### **Hauptfunktionen**
+## **Features**
 
-1. **Überwachung von** `ouf_update`**:**
-   * Überprüft den Status des `ouf_update` Prozesses und reagiert auf dessen Ausfall.
-2. **Automatischer Neustart:**
-   * Startet die Dienste neu, wenn `ouf_update` nicht aktiv ist.
+### **Main Functions**
+
+1. **Monitoring** `ouf_update`**:**
+   * Checks the status of the `ouf_update` process and responds to its failure.
+2. **Automatic Restart:**
+   * Restarts the services if `ouf_update` is not active.
 3. **Logging:**
-   * Protokolliert wichtige Informationen und Aktionen des Skripts.
-4. **Log-Rotation und Bereinigung:**
-   * Rotiert täglich die Logdateien, wenn sie größer als 0 Byte sind, und behält die letzten 20 Einträge.
-   * Löscht Logdateien, die älter als 30 Tage sind.
+   * Records important information and actions of the script.
+4. **Log Rotation and Cleanup:**
+   * Rotates daily log files if they are larger than 0 bytes, keeping the last 20 entries.
+   * Deletes log files older than 30 days.
 
-### **Konfigurationsmanagement**
+### **Configuration Management**
 
-* **Konfigurationsdatei (**`other.ini`):
-  * `ouf_cron_auto_restart`: Steuert den automatischen Neustart (`true` oder `false`).
-  * `ouf_cron_auto_restart_debug_level`: Legt das Log-Level fest (`DEBUG`, `INFO`, `OFF`).
+* **Configuration File (**`other.ini`):
+  * `ouf_cron_auto_restart`: Controls automatic restart (`true` or `false`).
+  * `ouf_cron_auto_restart_debug_level`: Sets the log level (`DEBUG`, `INFO`, `OFF`).
 
-### **Logik und Ablauf**
+### **Logic and Procedure**
 
-* **Initialisierung:** Setzt Pfade und Standardwerte.
-* **Log-Verzeichnis Erstellung:** Stellt sicher, dass das Log-Verzeichnis existiert.
-* **Log-Rotation:** Überprüft und rotiert die Logdateien.
-* **Hauptlogik:** Überwacht den `ouf_update` Prozess und führt bei Bedarf einen Neustart der Dienste durch.
+* **Initialization:** Sets paths and default values.
+* **Log Directory Creation:** Ensures that the log directory exists.
+* **Log Rotation:** Checks and rotates the log files.
+* **Main Logic:** Monitors the `ouf_update` process and performs a service restart if necessary.
 
-## **Ausführung**
+## **Execution**
 
-Das Skript wird über einen Cron-Job alle 60 Sekunden ausgeführt. Diese häufige Ausführung ist entscheidend für die zeitnahe Reaktion auf Ausfälle von `ouf_update`.
+The script is executed every 60 seconds via a cron job. This frequent execution is crucial for the timely response to failures of `ouf_update`.
 
-## **Voraussetzungen**
+## **Prerequisites**
 
-* Bash-Umgebung.
-* Zugriff auf Standard-Unix-Kommandos.
-* Vorhandensein und korrekte Konfiguration von `profile.sh`, `all_stop.sh` und `all_start.sh`.
+* Bash environment.
+* Access to standard Unix commands.
+* Presence and correct configuration of `profile.sh`, `all_stop.sh`, and `all_start.sh`.
 
-## **Log-Dateien**
+## **Log Files**
 
-* **Speicherort:** `/ouf-pica/log`.
-* **Aktuelles Logfile:** `ouf-restart.log`.
-* **Rotierte Logdateien:** `ouf-restart.log.YYYY-MM-DD`.
+* **Location:** `/ouf-pica/log`.
+* **Current Log File:** `ouf-restart.log`.
+* **Rotated Log Files:** `ouf-restart.log.YYYY-MM-DD`.
 
-## **Sicherheit und Wartung**
+## **Security and Maintenance**
 
-* Überprüfen Sie regelmäßig die Log-Dateien.
-* Stellen Sie sicher, dass die Berechtigungen für das Skript und die Konfigurationsdateien angemessen sind.
+* Regularly check the log files.
+* Ensure that permissions for the script and configuration files are appropriate.
 
 ## **Version**
 
-* Dokumentationsversion für `ouf-update.sh` Version 1.1.
+* Documentation version for `ouf-update.sh` Version 1.1.
 
-## **Wichtige Hinweise**
+## **Important Notes**
 
-* Die erste Zeile des Logfiles sollte das Datum enthalten, um eine korrekte Log-Rotation zu gewährleisten.
-* Die Konfigurationsdatei `other.ini` muss korrekt formatiert sein.
-* Der Cron-Job muss richtig konfiguriert sein, um eine ordnungsgemäße Ausführung zu gewährleisten.
+* The first line of the log file should contain the date for proper log rotation.
+* The `other.ini` configuration file must be correctly formatted.
+* The cron job must be correctly set up to ensure proper execution.
 
-Diese Dokumentation bietet eine umfassende Übersicht über das Skript und seine Funktionen, insbesondere im Hinblick auf die zeitnahe Reaktion auf Ausfälle des `ouf_update` Dienstes.
+This documentation provides a comprehensive overview of the script and its functionalities, particularly regarding the timely response to failures of the `ouf_update` service.
