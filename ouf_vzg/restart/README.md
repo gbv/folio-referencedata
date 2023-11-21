@@ -24,7 +24,8 @@
 
 * **Configuration File (**`other.ini`):
   * `ouf_cron_auto_restart`: Controls automatic restart (`true` or `false`).
-  * `ouf_cron_auto_restart_debug_level`: Sets the log level (`DEBUG`, `INFO`, `OFF`).
+  * `ouf_cron_syslog_server = 192.168.35.237`
+  * `ouf_cron_syslog_port = 514`
 
 ### **Logic and Procedure**
 
