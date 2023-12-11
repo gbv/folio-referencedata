@@ -54,7 +54,7 @@
                                 "type": "string"
                             },
                             "usedSince": {
-                                "description": "",
+                                "description": "Date since which the record has been used in the given institution",
                                 "type": "string",
                                 "format": "date"
                             }
