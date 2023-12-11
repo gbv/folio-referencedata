@@ -1,0 +1,30 @@
+{
+  "id": "bac08adf-98ef-44ee-8e8a-ab76128c92c1",
+  "code": "u",
+  "name": "Autopsie",
+  "source": "local",
+  "metadata": {
+    "createdBy": "GBV",
+    "createdDate": "2023-01-02",
+    "updatedBy": "SWB",
+    "updatedDate": "2023-12-11",
+    "usedBy": [
+      {
+        "institution": "GBV",
+        "usedSince": "2023-01-02"
+      },
+      {
+        "institution": "SWB",
+        "usedSince": "2023-04-15"
+      },
+      {
+        "institution": "hebis",
+        "usedSince": "2023-10-10"
+      },
+      {
+        "institution": "BVB",
+        "usedSince": "2023-12-10"
+      }
+    ]
+  }
+}

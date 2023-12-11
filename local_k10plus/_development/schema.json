@@ -1,0 +1,80 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.org/reference-values-schema.json",
+    "title": "FOLIO local reference data",
+    "description": "A schema to validate local reference data",
+    "type": "object",
+    "properties": {
+        "id": {
+            "description": "Unique ID of the reference data record; a UUID",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        },
+        "name": {
+            "description": "Label for the reference data record",
+            "type": "string"
+        },
+        "source": {
+            "description": "Origin of the reference data record",
+            "type": "string",
+            "pattern": "^local$"
+        },
+        "code": {
+            "description": "Some reference data records contain a code",
+            "type": "string"
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "createdBy": {
+                    "description": "Name of the institution who created the record",
+                    "type": "string"
+                },
+                "createdDate": {
+                    "description": "Date when the record was created",
+                    "type": "string",
+                    "format": "date"
+                },
+                "updatedBy": {
+                    "description": "Name of the institution who updated the record",
+                    "type": "string"
+                },
+                "updatedDate": {
+                    "description": "Date when the record was last updated",
+                    "type": "string",
+                    "format": "date"
+                },
+                "usedBy": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "institution": {
+                                "description": "Name of the institution",
+                                "type": "string"
+                            },
+                            "usedSince": {
+                                "description": "",
+                                "type": "string",
+                                "format": "date"
+                            }
+                        },
+                        "required": [
+                            "institution",
+                            "usedSince"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "createdBy",
+                "createdDate"
+            ]
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "source"
+    ]
+}
