@@ -1,7 +1,7 @@
 {
-  "id": "bac08adf-98ef-44ee-8e8a-ab76128c92c1",
-  "code": "u",
-  "name": "Autopsie",
+  "id": "2b94c631-fca9-4892-a730-03ee529ffe2a",
+  "name": "Personenname",
+  "ordering": "1",
   "source": "local",
   "provenance": {
     "createdBy": "GBV",
