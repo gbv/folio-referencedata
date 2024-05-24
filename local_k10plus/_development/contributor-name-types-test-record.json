@@ -2,7 +2,7 @@
   "id": "2b94c631-fca9-4892-a730-03ee529ffe2a",
   "name": "Personenname",
   "ordering": "1",
-  "source": "local",
+  "source": "consortium",
   "provenance": {
     "createdBy": "GBV",
     "createdDate": "2023-01-02",
