@@ -15,12 +15,9 @@ set -e
 : ${OKAPIPASSWORD:=$4}
 : ${OKAPIPASSWORD:=admin}
 
-TOKEN=$( curl -sS -D - -H "X-Okapi-Tenant: $TENANT" -H "Content-type: application/json" \
-  -d "{\"tenant\":\"$TENANT\",\"username\":\"$OKAPIUSERNAME\",\"password\":\"$OKAPIPASSWORD\"}" \
-  "$OKAPI/authn/login" \
-  | grep -i "^x-okapi-token: " | tr -d "\n\r" )
-
-echo "TOKEN=$TOKEN"
+COOKIES=$( mktemp --tmpdir cookies.XXXXXXXXXX )
+LOGIN=$( jq -n -c --arg username "$OKAPIUSERNAME" --arg password "$OKAPIPASSWORD" '{"username": $username, "password": $password}' )
+curl -w"\n\n" -sS -D - -j -c $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "Content-type: application/json" -d "$LOGIN" $OKAPI/authn/login-with-expiry
 
 process ()
 {
@@ -40,7 +37,7 @@ process ()
     id=$(echo "$line" | cut -f 2)
     name=$(echo "$line" | cut -f 3)
    
-    json=$(curl --dump-header dump-header -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" "$OKAPI/$endpoint/$id")
+    json=$(curl --dump-header dump-header -sS -b $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "$OKAPI/$endpoint/$id")
     header=$(cat dump-header)
     rm dump-header
     if echo "$header" | head -1 | grep -q 404
@@ -51,7 +48,7 @@ process ()
       echo "$OKAPI$1/$endpoint/$id $name found on server"
       processed=$(( processed + 1 ))
         
-      response=$(curl -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
+      response=$(curl -sS -b $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "Content-Type: application/json" \
 	    -X DELETE "$OKAPI/$endpoint/$id")
     
       if [ -z "$response"]
@@ -69,3 +66,4 @@ process ()
 
 process  < toBeDeleted.tsv
 
+rm $COOKIES

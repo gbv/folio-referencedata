@@ -15,27 +15,26 @@ set -e
 : ${OKAPIPASSWORD:=$4}
 : ${OKAPIPASSWORD:=admin}
 
-TOKEN=$( curl -sS -D - -H "X-Okapi-Tenant: $TENANT" -H "Content-type: application/json" \
-  -d "{\"tenant\":\"$TENANT\",\"username\":\"$OKAPIUSERNAME\",\"password\":\"$OKAPIPASSWORD\"}" \
-  "$OKAPI/authn/login" \
-  | grep -i "^x-okapi-token: " | tr -d "\n\r" )
-
-echo "TOKEN=$TOKEN"
+COOKIES=$( mktemp --tmpdir cookies.XXXXXXXXXX )
+LOGIN=$( jq -n -c --arg username "$OKAPIUSERNAME" --arg password "$OKAPIPASSWORD" '{"username": $username, "password": $password}' )
+curl -w"\n\n" -sS -D - -j -c $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "Content-type: application/json" -d "$LOGIN" $OKAPI/authn/login-with-expiry
 
 find -type f -name "*.json" | while IFS= read -r file; do
   echo "$file"
   endpoint=$(basename "$(dirname "$file")")
   resource_id=$(jq -r '.id' "$file")
   if [ -z "$resource_id" ]; then
-    curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
+    curl -w"\n" -sS -b $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "Content-Type: application/json" \
       -d "@$file" "$OKAPI/$endpoint"
   else
-    response=$(curl -w"\n%{http_code}" -sS -X PUT -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
+    response=$(curl -w"\n%{http_code}" -sS -b $COOKIES -X PUT -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
       -d "@$file" "$OKAPI/$endpoint/$resource_id")
     status_code=$(echo "$response" | tail -n 1)
     if [ "$status_code" = "404" ]; then
-      curl -w"\n" -sS -H "X-Okapi-Tenant: $TENANT" -H "$TOKEN" -H "Content-Type: application/json" \
+      curl -w"\n" -sS -b $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "Content-Type: application/json" \
         -d "@$file" "$OKAPI/$endpoint"
     fi
   fi
 done
+
+rm $COOKIES
