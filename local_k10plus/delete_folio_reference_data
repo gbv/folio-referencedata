@@ -37,21 +37,21 @@ process ()
     id=$(echo "$line" | cut -f 2)
     name=$(echo "$line" | cut -f 3)
    
-    json=$(curl --dump-header dump-header -sS -b $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "$OKAPI/$endpoint/$id")
+    json=$(curl --dump-header dump-header -sS -b $COOKIES -H "X-Okapi-Tenant: $TENANT" "$OKAPI/$endpoint/$id")
     header=$(cat dump-header)
     rm dump-header
     if echo "$header" | head -1 | grep -q 404
     then
-      echo "$OKAPI$1/$endpoint/$id $name not found on server"
+      echo "$OKAPI/$endpoint/$id $name not found on server"
       norecord=$(( norecord + 1 ))
     else
-      echo "$OKAPI$1/$endpoint/$id $name found on server"
+      echo "$OKAPI/$endpoint/$id $name found on server"
       processed=$(( processed + 1 ))
         
       response=$(curl -sS -b $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "Content-Type: application/json" \
 	    -X DELETE "$OKAPI/$endpoint/$id")
     
-      if [ -z "$response"]
+      if [ -z "$response" ]
       then 
         deleted=$(( deleted + 1 ))
       else
@@ -64,6 +64,6 @@ process ()
   echo "$norecord not found on server, $processed processed, $deleted deleted, $failed failed"
 }
 
-process  < toBeDeleted.tsv
+process < toBeDeleted.tsv
 
 rm $COOKIES
