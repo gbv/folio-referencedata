@@ -17,12 +17,20 @@ set -e
 
 COOKIES=$( mktemp --tmpdir cookies.XXXXXXXXXX )
 LOGIN=$( jq -n -c --arg username "$OKAPIUSERNAME" --arg password "$OKAPIPASSWORD" '{"username": $username, "password": $password}' )
-curl -w"\n\n" -sS -D - -j -c $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "Content-type: application/json" -d "$LOGIN" $OKAPI/authn/login-with-expiry
+LOGINRESPONSE=$( curl -w"\n\n" -sS -D - -j -c $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "Content-type: application/json" -d "$LOGIN" $OKAPI/authn/login-with-expiry )
+if echo "$LOGINRESPONSE" | head -1 | grep ' 201 '
+then
+  echo "Login succeeded"
+else
+  echo "Login failed"
+  echo "$LOGINRESPONSE"
+  rm "$COOKIES"
+  exit 1
+fi
 
 process ()
 {
   norecord=0
-  processed=0
   deleted=0
   failed=0
 
@@ -36,32 +44,31 @@ process ()
     endpoint=$(echo "$line" | cut -f 1)
     id=$(echo "$line" | cut -f 2)
     name=$(echo "$line" | cut -f 3)
-   
-    json=$(curl --dump-header dump-header -sS -b $COOKIES -H "X-Okapi-Tenant: $TENANT" "$OKAPI/$endpoint/$id")
+
+    response=$(curl --dump-header dump-header -sS -b $COOKIES -H "X-Okapi-Tenant: $TENANT" -X DELETE "$OKAPI/$endpoint/$id")
     header=$(cat dump-header)
     rm dump-header
-    if echo "$header" | head -1 | grep -q 404
-    then
-      echo "$OKAPI/$endpoint/$id $name not found on server"
-      norecord=$(( norecord + 1 ))
-    else
-      echo "$OKAPI/$endpoint/$id $name found on server"
-      processed=$(( processed + 1 ))
-        
-      response=$(curl -sS -b $COOKIES -H "X-Okapi-Tenant: $TENANT" -H "Content-Type: application/json" \
-	    -X DELETE "$OKAPI/$endpoint/$id")
-    
-      if [ -z "$response" ]
-      then 
+    status=$( echo "$header" | head -1 | cut -d ' ' -f 2 )
+    case "$status" in
+      404)
+        echo "$OKAPI/$endpoint/$id ($name) not found on server"
+        norecord=$(( norecord + 1 ))
+        ;;
+      204)
+        echo "$OKAPI/$endpoint/$id ($name) deleted"
         deleted=$(( deleted + 1 ))
-      else
-        echo "$response" 
+        ;;
+      *)
+        echo "$OKAPI/$endpoint/$id ($name) failed:"
+        echo "$header"
+        echo "$response"
+        echo
         failed=$(( failed + 1 ))
-      fi
-    fi
+        ;;
+    esac
   done
   
-  echo "$norecord not found on server, $processed processed, $deleted deleted, $failed failed"
+  echo "$norecord not found on server, $deleted deleted, $failed failed"
 }
 
 process < toBeDeleted.tsv
